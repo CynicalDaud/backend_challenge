@@ -9,9 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-
 
 /**
  * The Task class represents a task with various attributes such as title, description, and priority.
@@ -98,6 +95,9 @@ public class Task {
 	// ID
 	public UUID getId() {
 		return id;
+	}
+	public void setId(UUID id) {
+		this.id = id;
 	}
     
     // Created At
