@@ -1,5 +1,7 @@
+com/liam/spring/jpa/postgresql/model/TaskDTO.class
 com/liam/spring/App.class
 com/liam/spring/jpa/postgresql/model/Task.class
 com/liam/spring/jpa/postgresql/services/TaskServices.class
 com/liam/spring/jpa/postgresql/repository/TaskRepository.class
 com/liam/spring/jpa/postgresql/controller/TaskController.class
+com/liam/spring/jpa/postgresql/components/TaskDTOScheduler.class

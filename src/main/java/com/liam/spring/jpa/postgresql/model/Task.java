@@ -3,6 +3,8 @@ package com.liam.spring.jpa.postgresql.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.liam.spring.jpa.postgresql.model.TaskDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,50 +47,39 @@ public class Task {
     private LocalDateTime resolvedAt;
     
     // CONSTRUCTORS   
+    
     /**
-     * Constructs a new Task with the provided attributes and default values.
-     *
-     * @param dueDate     The date and time by which the task is expected to be completed.
-     * @param title       The title or name of the task.
-     * @param description A detailed description of the task.
-     * @param priority    The priority level of the task (e.g., high, medium, low).
-     * 
-     * Note: 'createdAt' and 'updatedAt' are NOW by default, 'resolvedAt' is null and 'status' open.
+     * Constructs a new Task from provided DTO
+     * @param taskDTO
      */
-    public Task(LocalDateTime dueDate, String title, String description, String priority) {
-        this(LocalDateTime.now(), dueDate, null, title, description, priority, "open");
-    }
-
-    /**
-     * Constructs a new Task with the provided attributes.
-     *
-     * @param createdAt   The date and time when the task was created.
-     * @param dueDate     The date and time by which the task is expected to be completed.
-     * @param resolvedAt  The date and time when the task was resolved or completed.
-     * @param title       The title or name of the task.
-     * @param description A detailed description of the task.
-     * @param priority    The priority level of the task (e.g., high, medium, low).
-     * @param status      The current status of the task (e.g., open, in progress, completed).
-     *
-     * Note: The 'updatedAt' parameter will be initialised equal to 'createdAt'
-     */
-    public Task(LocalDateTime createdAt, LocalDateTime dueDate, LocalDateTime resolvedAt, 
-    			String title, String description, String priority, String status) 
-    {
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-        this.dueDate = dueDate;
-        this.resolvedAt = resolvedAt;
-        this.title = title;
-        this.description = description;
-        this.priority = priority;
-        this.status = status;
+    public Task(TaskDTO taskDTO) {
+        this.id = taskDTO.getId();
+        this.dueDate = taskDTO.getDueDate();
+        this.title = taskDTO.getTitle();
+        this.description = taskDTO.getDescription();
+        this.priority = taskDTO.getPriority();
+        this.status = taskDTO.getStatus();
+        this.createdAt = taskDTO.getCreatedAt();
+        this.updatedAt = taskDTO.getUpdatedAt();
+        this.resolvedAt = taskDTO.getResolvedAt();
     }
     
     /**
      * An empty constructor needed for Hibernate.
      */
     private Task() {}
+    
+    // DTO Compatibility
+
+    /**
+     * Converts the Task instance to a TaskDTO.
+     *
+     * @return TaskDTO representing the current state of the Task instance.
+     */
+    public TaskDTO toDTO() {
+        TaskDTO taskDTO = new TaskDTO(this);
+        return taskDTO;
+    }
 
 	// GETTERS & SETTERS
 	

@@ -1,66 +1,94 @@
 package com.liam.spring.jpa.postgresql.controller;
 
-import com.liam.spring.jpa.postgresql.model.Task;
+import com.liam.spring.jpa.postgresql.model.TaskDTO;
 import com.liam.spring.jpa.postgresql.services.TaskServices;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
+/**
+ * REST controller for handling Tasks.
+ */
 @RestController
 public class TaskController {
 
-  private final TaskServices taskService;
+    private final TaskServices taskService;
 
-  @Autowired
-  public TaskController(TaskServices taskService) {
-	  this.taskService = taskService;
-  }
-  
-  @GetMapping("/tasks")
-  public Iterable<Task> fetchAllTasks() {
-	  return this.taskService.getAllTasksDesc();
-  }
-  
-  @GetMapping("tasks/id/{taskId}")
-  public ResponseEntity<Task> getTaskById(@PathVariable (name="taskId") UUID taskId) 
-  {
-	  Optional<Task> task = taskService.getTaskById(taskId);
-      return task.map(ResponseEntity::ok).orElseGet(() ->
-      				  ResponseEntity.notFound().build());
-  }
+    /**
+     * Constructor to inject TaskServices dependency.
+     *
+     * @param taskService The TaskServices instance used for handling task-related operations.
+     */
+    @Autowired
+    public TaskController(TaskServices taskService) {
+        this.taskService = taskService;
+    }
 
-  @PostMapping("/tasks/add")
-  public Task addTask(@RequestBody Task task) {
-	  return this.taskService.saveTask(task);
-  }
-  
-  @DeleteMapping("/tasks/delete/{taskId}")
-  public ResponseEntity<Task> deleteTaskById(@PathVariable (name="taskId") UUID taskId) 
-  {	
-	  Optional<Task> task = taskService.deleteTaskById(taskId);
-      return task.map(ResponseEntity::ok).orElseGet(() ->
-      				  ResponseEntity.notFound().build());
-  }  
-  
-  @PutMapping("/tasks/replace/{taskId}")
-  public ResponseEntity<Task> changeTask(@PathVariable (name="taskId") UUID taskId,
-		  				 @RequestBody Task taskNew)
-{	
-	  taskNew.setId(taskId);
-	  System.out.println(taskNew.getId());
-	  System.out.println("");
-	  Optional<Task> task = this.taskService.changeTask(taskId, taskNew);
-	  return task.map(ResponseEntity::ok).orElseGet(() ->
-	  				  ResponseEntity.notFound().build());
-  }
+    /**
+     * Retrieves all tasks in descending order.
+     *
+     * @return Iterable collection of TaskDTOs.
+     */
+    @GetMapping("/tasks")
+    public Iterable<TaskDTO> fetchAllTasks() {
+        return this.taskService.getAllTasksDesc();
+    }
+
+    /**
+     * Retrieves a task by its unique identifier.
+     *
+     * @param taskId The UUID of the task to retrieve.
+     * @return ResponseEntity containing the retrieved task or a 404 status if not found.
+     */
+    @GetMapping("tasks/id/{taskId}")
+    public ResponseEntity<TaskDTO> getTaskById(@PathVariable(name = "taskId") UUID taskId) {
+        Optional<TaskDTO> task = taskService.getTaskById(taskId);
+        return task.map(ResponseEntity::ok).orElseGet(() ->
+                ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Adds a new task.
+     *
+     * @param task The TaskDTO to be added.
+     * @return The added TaskDTO.
+     */
+    @PostMapping("/tasks/add")
+    public TaskDTO addTask(@RequestBody TaskDTO task) {
+        return this.taskService.saveTask(task);
+    }
+
+    /**
+     * Deletes a task by its unique identifier.
+     *
+     * @param taskId The UUID of the task to be deleted.
+     * @return ResponseEntity indicating success or a 404 status if the task does not exist.
+     */
+    @DeleteMapping("/tasks/delete/{taskId}")
+    public ResponseEntity<TaskDTO> deleteTaskById(@PathVariable(name = "taskId") UUID taskId) {
+        Optional<TaskDTO> task = taskService.deleteTaskById(taskId);
+        return task.map(ResponseEntity::ok).orElseGet(() ->
+                ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Replaces an existing task with a new one.
+     *
+     * @param taskId  The UUID of the task to be replaced.
+     * @param taskNew The new Task entity to replace the existing one.
+     * @return ResponseEntity containing the replaced task or a 404 status if the original task is not found.
+     */
+    @PatchMapping("/tasks/update/{taskId}")
+    public ResponseEntity<TaskDTO> changeTask(@PathVariable(name = "taskId") UUID taskId,
+                                           @RequestBody Map<String, Object> updates) {
+        Optional<TaskDTO > task = this.taskService.changeTask(taskId, updates);
+        return task.map(ResponseEntity::ok).orElseGet(() ->
+                ResponseEntity.notFound().build());
+    }
+    
+   
 }
