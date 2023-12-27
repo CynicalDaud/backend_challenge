@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  app:
+    image: challenge_image
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: challenge_db
+      POSTGRES_USER: liam
+      POSTGRES_PASSWORD: craftworks
+     

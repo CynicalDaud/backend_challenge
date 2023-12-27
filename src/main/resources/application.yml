@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/challenge_db
+    url: jdbc:postgresql://db:5432/challenge_db
     username: liam
     password: craftworks
   jpa:
