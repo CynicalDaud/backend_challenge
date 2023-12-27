@@ -17,3 +17,8 @@ To build the Docker image, follow these steps:
 - Build the Docker image using the provided Dockerfile with the image name _challenge_image_
 
 Once the image has been built it can be run with __docker-compose up__ 
+
+
+## Structure
+
+You can find the __jar__ file within the __target__ sub-directory. 
