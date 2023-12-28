@@ -1,4 +1,4 @@
-FROM openjdk
+FROM eclipse-temurin
 
 # Set the working directory to /app
 WORKDIR /app
