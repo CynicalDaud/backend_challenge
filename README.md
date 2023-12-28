@@ -32,5 +32,4 @@ You can find the __jar__ file within the __target__ sub-directory. Source code c
   - Full (Due date, title, description, priority, status, created at, resolved at) will only set the "updated at" field dynamically (given current time)
 - __DELETE .../tasks/delete/{taskID}__: Delete task by its unique identifier
 - __PATCH .../tasks/update/{taskID}__: Replace contents at task given its unique identifier
-  The new contents for the task should be included in the body of the request according to the same constructors as POST
-
+  The new contents for the task should be included in the body of the request. Any number of the Task parameters can be specified for replacement. Only those non-null parameters present in the body will be changed.
