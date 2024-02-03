@@ -2,16 +2,16 @@ package com.liam.spring.jpa.postgresql.services;
 
 import com.liam.spring.jpa.postgresql.model.Task;
 import com.liam.spring.jpa.postgresql.model.TaskDTO;
+import com.liam.spring.jpa.postgresql.model.TaskUpdateDTO;
 import com.liam.spring.jpa.postgresql.repository.TaskRepository;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class TaskServices {
 
 	private final TaskRepository taskRepository;
+	final Logger logger = LoggerFactory.getLogger(TaskServices.class);
 
 	@Autowired
 	public TaskServices(TaskRepository taskRepository) {
@@ -35,7 +36,7 @@ public class TaskServices {
 	 * @return List of tasks ordered by creation date (newest first).
 	 */
 	public List<TaskDTO> getAllTasksDesc() {
-		System.out.println("\n Getting all tasks \n");
+		logger.info("\n Getting all tasks \n");
 		return taskRepository.findAllOrderByCreatedAtDesc().stream()
 							 .map(TaskDTO::new).collect(Collectors
 							 .toList());
@@ -48,7 +49,7 @@ public class TaskServices {
 	 * @return Optional containing the retrieved task, or empty if not found.
 	 */
 	public Optional<TaskDTO> getTaskById(UUID taskId) {
-		System.out.println("\n Getting task with ID: " + taskId + "\n");
+		logger.info("\n Getting task with ID: " + taskId + "\n");
 		return taskRepository.findById(taskId).map(TaskDTO::new);
 	}
 
@@ -59,7 +60,13 @@ public class TaskServices {
 	 * @return taskDTO containing the saved task.
 	 */
 	public TaskDTO saveTask(TaskDTO taskDTO) {
-		System.out.println("\n Saving task with ID: " + taskDTO.getId() + "\n");
+		logger.info("\n Saving task with ID: " + taskDTO.getId() + "\n");
+		// Check if a task with the given ID already exists
+		Optional<Task> existingTask = taskRepository.findById(taskDTO.getId());
+		if (existingTask.isPresent()) {
+			// Throw an exception or return an error message
+			throw new IllegalArgumentException("A task with the given ID already exists.");
+		}
 		Task taskEntity = taskDTO.toEntity();
 		taskRepository.save(taskEntity);
 		return taskEntity.toDTO();
@@ -72,13 +79,13 @@ public class TaskServices {
 	 * @return Optional containing the deleted task, or empty if not found.
 	 */
 	public Optional<TaskDTO> deleteTaskById(UUID taskId) {
-		System.out.println("\n Deleting task with ID: " + taskId);
+		logger.info("\n Deleting task with ID: " + taskId);
 		// Try get task
 		Optional<Task> task = taskRepository.findById(taskId);
 		// Remove if exists
 		task.ifPresent(t -> {
 			taskRepository.deleteById(taskId);
-			System.out.println("Task deleted \n");
+			logger.info("Task deleted \n");
 		});
 		return task.map(TaskDTO::new);
 	}
@@ -93,26 +100,29 @@ public class TaskServices {
 	 * @return Optional containing the updated task, or empty if the original task
 	 *         was not found.
 	 */
-	public Optional<TaskDTO> changeTask(UUID taskId, Map<String, Object> updates) {
-		System.out.println("\n Replacing task with ID: " + taskId);
-		// Get current task from DB
-		Optional<Task> taskOld = taskRepository.findById(taskId);
-		return taskOld.map(task -> {
-
-			// Copy non-null properties from updates to the existing task
-			applyUpdates(task, updates);
-
-			// Save the updated task
+	public Optional<TaskDTO> changeTask(UUID taskId, TaskUpdateDTO updates) {
+		Optional<Task> taskEntity = taskRepository.findById(taskId);
+		return taskEntity.map(task -> {
+			if (updates.getTitle() != null) {
+				task.setTitle(updates.getTitle());
+			}
+			if (updates.getDescription() != null) {
+				task.setDescription(updates.getDescription());
+			}
+			if (updates.getPriority() != null) {
+				task.setPriority(updates.getPriority());
+			}
+			if (updates.getStatus() != null) {
+				task.setStatus(updates.getStatus());
+			}
+			if (updates.getDueDate() != null) {
+				task.setDueDate(updates.getDueDate());
+			}
+			if (updates.getResolvedAt() != null) {
+				task.setResolvedAt(updates.getResolvedAt());
+			}
 			taskRepository.save(task);
-
 			return Optional.of(task.toDTO());
 		}).orElse(Optional.empty());
-	}
-
-	// Utility method to apply updates to an object
-	private void applyUpdates(Object target, Map<String, Object> updates) {
-		BeanWrapper beanWrapper = new BeanWrapperImpl(target);
-		MutablePropertyValues propertyValues = new MutablePropertyValues(updates);
-		beanWrapper.setPropertyValues(propertyValues, true, true);
-	}
+	}	
 }

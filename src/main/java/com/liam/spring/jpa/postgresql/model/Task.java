@@ -8,7 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * The Task class represents a task with various attributes such as title,
@@ -41,8 +45,13 @@ public class Task {
 	@Column(name = "status", nullable = false, length = 512)
 	private String status = "open";
 
-	private LocalDateTime createdAt = LocalDateTime.now();
-	private LocalDateTime updatedAt = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+	@Column(name = "resolvedAt")
 	private LocalDateTime resolvedAt;
 
 	// CONSTRUCTORS
@@ -82,6 +91,13 @@ public class Task {
 		TaskDTO taskDTO = new TaskDTO(this);
 		return taskDTO;
 	}
+
+	// CODE TO MAINTAIN UPDATED AT
+
+	@PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 	// GETTERS & SETTERS
 

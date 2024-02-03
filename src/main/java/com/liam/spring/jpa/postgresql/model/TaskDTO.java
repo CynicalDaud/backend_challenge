@@ -3,6 +3,14 @@ package com.liam.spring.jpa.postgresql.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 /**
  * The TaskDTO class represents a Data Transfer Object (DTO) for the Task
  * entity. It is used to transfer data between the service layer and the
@@ -10,14 +18,33 @@ import java.util.UUID;
  */
 public class TaskDTO {
 
+	// PARAMETERS
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private UUID id;
+
+	@Column(name = "dueDate", nullable = false)
 	private LocalDateTime dueDate;
+
+	@Column(name = "title", nullable = false, length = 512)
 	private String title;
+
+	@Column(name = "description", nullable = false, length = 512)
 	private String description;
+
+	@Column(name = "priority", nullable = false, length = 512)
 	private String priority;
+
+	@Column(name = "status", nullable = false, length = 512)
 	private String status = "open";
-	private LocalDateTime createdAt = LocalDateTime.now();
-	private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+	@Column(name = "resolvedAt")
 	private LocalDateTime resolvedAt;
 
 	/**
@@ -71,6 +98,7 @@ public class TaskDTO {
 	 */
 	public TaskDTO(LocalDateTime dueDate, String title, String description, String priority, String status,
 			LocalDateTime createdAt, LocalDateTime resolvedAt) {
+		this.id = UUID.randomUUID(); // Generate a random UUID
 		this.dueDate = dueDate;
 		this.title = title;
 		this.description = description;
