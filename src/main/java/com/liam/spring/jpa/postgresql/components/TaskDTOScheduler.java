@@ -1,7 +1,7 @@
 package com.liam.spring.jpa.postgresql.components;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,7 +41,7 @@ public class TaskDTOScheduler {
     @Scheduled(fixedRate = 50000)
     public void createAndPersistRandomTask() {
         // Generate random data for a TaskDTO
-        TaskDTO newTask = new TaskDTO(LocalDateTime.now().plusDays(new Random().nextInt(30)),
+        TaskDTO newTask = new TaskDTO(LocalDateTime.now().plusDays(ThreadLocalRandom.current().nextInt(30)),
                 "Random Task ", "Random description", generateRandomValue("High", "Medium", "Low"),
                 generateRandomValue("Open", "In Progress", "Closed"), LocalDateTime.now(), null);
 
@@ -61,6 +61,6 @@ public class TaskDTOScheduler {
      * @return [values] randomly selected value from the array.
      */
     private String generateRandomValue(String... values) {
-        return values[new Random().nextInt(values.length)];
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 }
